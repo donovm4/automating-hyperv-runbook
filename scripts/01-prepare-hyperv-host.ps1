@@ -100,7 +100,17 @@ if ($ExpectedSha256) {
     }
     Write-Host "SHA256 matches expected value." -ForegroundColor Green
 } else {
-    Write-Host "No -ExpectedSha256 provided; computed SHA256 shown above for your records."
+    Write-Host "No -ExpectedSha256 provided; computed SHA256 shown above for your records." -ForegroundColor Gray
 }
 
 Write-Host "`nAll checks passed." -ForegroundColor Green
+
+$RunScriptOnChecksPassed = $false
+
+if ($RunScriptOnChecksPassed) {
+    Write-Host ""
+    Write-Host "Executing downloaded script..." -ForegroundColor Yellow
+    $TempScriptPath = Join-Path (Get-Location).Path "MicrosoftAzureMigrate-Hyper-V.ps1"
+    . $TempScriptPath
+}
+
