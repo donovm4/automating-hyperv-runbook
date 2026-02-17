@@ -7,4 +7,8 @@ $Location = "centralus"
 $ResourceGroupName = "rg-Azure-Migrate"
 $ApiVersion = "2020-06-01-preview"
 
-New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile ../templates/test.json -projectName $ProjectName -location $Location -ApiVersion $ApiVersion -Verbose
+Write-Host "Creating Resource Group: $ResourceGroupName in $Location" -ForegroundColor Yellow
+New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Force -Verbose 
+
+Write-Host "Creating Azure Migrate Project: $ResourceGroupName -> $ProjectName in $Location" -ForegroundColor Yellow
+New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile ../templates/azure-migrate-project.json -projectName $ProjectName -location $Location -ApiVersion $ApiVersion -Verbose

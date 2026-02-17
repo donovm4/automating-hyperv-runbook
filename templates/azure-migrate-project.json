@@ -14,6 +14,13 @@
       "metadata": {
         "description": "Azure region for the Azure Migrate project"
       }
+    },
+    "ApiVersion": {
+      "type": "string",
+      "defaultValue": "2020-01-01",
+      "metadata": {
+        "description": "API version for the Azure Migrate project"
+      }
     }
   },
   "resources": [
