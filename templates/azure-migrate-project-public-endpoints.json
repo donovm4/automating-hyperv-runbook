@@ -29,7 +29,9 @@
         "apiVersion": "[parameters('ApiVersion')]",
         "name": "[parameters('projectName')]",
         "location": "[parameters('location')]",
-        "properties": {}
+        "properties": {
+          "publicNetworkAccess": "Enabled"
+        }
     }
   ]
 }
