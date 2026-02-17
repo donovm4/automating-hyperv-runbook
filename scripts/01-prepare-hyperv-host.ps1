@@ -105,12 +105,12 @@ if ($ExpectedSha256) {
 
 Write-Host "`nAll checks passed." -ForegroundColor Green
 
-$RunScriptOnChecksPassed = $false
-
-if ($RunScriptOnChecksPassed) {
+$RunScriptOnChecksPassed = Read-Host "Do you want to execute the downloaded script now? (Y/N)"
+if ($RunScriptOnChecksPassed -match '^[Yy]') {
     Write-Host ""
     Write-Host "Executing downloaded script..." -ForegroundColor Yellow
     $TempScriptPath = Join-Path (Get-Location).Path "MicrosoftAzureMigrate-Hyper-V.ps1"
     . $TempScriptPath
+} else {
+    Write-Host "Script execution skipped." -ForegroundColor Magenta
 }
-
