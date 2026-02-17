@@ -17,3 +17,8 @@
 > - assign **Application Developer** role to specified account
 
 This script currently ONLY creates a role assignment (Owner or Contributor) for a specified user.
+
+
+## `create-migrate-project.ps1`
+
+This script creates an Azure Migrate project, in an existing resource group.
