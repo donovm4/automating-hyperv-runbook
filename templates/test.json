@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-08-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "projectName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Azure Migrate project"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Azure region for the Azure Migrate project"
+      }
+    }
+  },
+  "resources": [
+    {
+        "type": "Microsoft.Migrate/MigrateProjects",
+        "apiVersion": "[parameters('ApiVersion')]",
+        "name": "[parameters('projectName')]",
+        "location": "[parameters('location')]",
+        "properties": {}
+    }
+  ]
+}
