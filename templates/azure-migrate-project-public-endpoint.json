@@ -10,7 +10,7 @@
     },
     "location": {
       "type": "string",
-      "defaultValue": "eastus",
+      "defaultValue": "centralus",
       "metadata": {
         "description": "Azure region for the Azure Migrate project"
       }

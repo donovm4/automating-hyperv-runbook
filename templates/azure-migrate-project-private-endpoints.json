@@ -1,0 +1,171 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-08-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "projectName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Azure Migrate project"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "centralus",
+      "metadata": {
+        "description": "Azure region for the Azure Migrate project"
+      }
+    },
+    "ApiVersion": {
+      "type": "string",
+      "defaultValue": "2020-01-01",
+      "metadata": {
+        "description": "API version for the Azure Migrate project"
+      }
+    }, 
+    "vnetResourceId": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource ID of the virtual network for private endpoint"
+      }
+    },
+    "subnetResourceId": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource ID of the subnet for private endpoint"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Migrate/MigrateProjects",
+      "apiVersion": "[parameters('ApiVersion')]",
+      "name": "[parameters('projectName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+                "type": "SystemAssigned"
+      },
+      "properties": {
+        "publicNetworkAccess": "Enabled",
+        "privateEndpointConnections": [],
+        "connectivityType": "PrivateEndpoint",
+        "privateEndpointConfiguration": {
+          "virtualNetworkId": "[parameters('vnetResourceId')]",
+          "subnetId": "[parameters('subnetResourceId')]"
+        }
+      }
+    },
+    {
+            "type": "Microsoft.Network/privateEndpoints",
+            "apiVersion": "2020-05-01",
+            "name": "test-private1204pe",
+            "location": "[parameters('location')]",
+            "dependsOn": [],
+            "tags": {
+                "MigrateProject": "test-private"
+            },
+            "properties": {
+                "privateLinkServiceConnections": [
+                    {
+                        "name": "test-private1204pe",
+                        "properties": {
+                            "privateLinkServiceId": "[resourceId('Microsoft.Migrate/MigrateProjects', parameters('projectName'))]",
+                            "groupIds": [
+                                "Default"
+                            ]
+                        }
+                    }
+                ],
+                "subnet": {
+                    "id": "[parameters('subnetResourceId')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones",
+            "apiVersion": "2018-09-01",
+            "name": "privatelink.prod.migration.windowsazure.com",
+            "location": "global",
+            "dependsOn": [
+                "/subscriptions/d717cc8e-8af6-4764-bb9a-c86a529be857/resourceGroups/rg-Azure-Migrate/providers/Microsoft.Network/privateEndpoints/test-private1204pe"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones",
+            "apiVersion": "2024-06-01",
+            "name": "privatelink.blob.core.windows.net",
+            "location": "global",
+            "dependsOn": [
+                "/subscriptions/d717cc8e-8af6-4764-bb9a-c86a529be857/resourceGroups/rg-Azure-Migrate/providers/Microsoft.Network/privateEndpoints/test-private1204pe"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+            "apiVersion": "2018-09-01",
+            "name": "privatelink.prod.migration.windowsazure.com/vnet-hub1653vnetlink",
+            "location": "global",
+            "dependsOn": [
+                "/subscriptions/d717cc8e-8af6-4764-bb9a-c86a529be857/resourceGroups/rg-Azure-Migrate/providers/Microsoft.Network/privateDnsZones/privatelink.prod.migration.windowsazure.com"
+            ],
+            "properties": {
+                "virtualNetwork": {
+                    "id": "/subscriptions/d717cc8e-8af6-4764-bb9a-c86a529be857/resourceGroups/rg-Azure-Migrate/providers/Microsoft.Network/virtualNetworks/vnet-hub"
+                },
+                "registrationEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+            "apiVersion": "2018-09-01",
+            "name": "privatelink.blob.core.windows.net/vnet-hub1653vnetlink",
+            "location": "global",
+            "dependsOn": [
+                "/subscriptions/d717cc8e-8af6-4764-bb9a-c86a529be857/resourceGroups/rg-Azure-Migrate/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net"
+            ],
+            "properties": {
+                "virtualNetwork": {
+                    "id": "/subscriptions/d717cc8e-8af6-4764-bb9a-c86a529be857/resourceGroups/rg-Azure-Migrate/providers/Microsoft.Network/virtualNetworks/vnet-hub"
+                },
+                "registrationEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+            "apiVersion": "2020-05-01",
+            "name": "test-private1204pe/test-private1204dnszonegroup",
+            "location": "centralus",
+            "dependsOn": [
+                "/subscriptions/d717cc8e-8af6-4764-bb9a-c86a529be857/resourceGroups/rg-Azure-Migrate/providers/Microsoft.Network/privateEndpoints/test-private1204pe",
+                "/subscriptions/d717cc8e-8af6-4764-bb9a-c86a529be857/resourceGroups/rg-Azure-Migrate/providers/Microsoft.Network/privateDnsZones/privatelink.prod.migration.windowsazure.com"
+            ],
+            "properties": {
+                "privateDnsZoneConfigs": [
+                    {
+                        "name": "privatelink.prod.migration.windowsazure.com",
+                        "properties": {
+                            "privateDnsZoneId": "/subscriptions/d717cc8e-8af6-4764-bb9a-c86a529be857/resourceGroups/rg-Azure-Migrate/providers/Microsoft.Network/privateDnsZones/privatelink.prod.migration.windowsazure.com"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Migrate/MigrateProjects/Solutions",
+            "apiVersion": "2020-06-01-preview",
+            "name": "test-private/Servers-Discovery-ServerDiscovery",
+            "dependsOn": [],
+            "properties": {
+                "tool": "ServerDiscovery",
+                "purpose": "Discovery",
+                "goal": "Servers",
+                "status": "Inactive",
+                "details": {
+                    "extendedDetails": {
+                        "privateEndpointDetails": "{\"subnetId\":\"/subscriptions/d717cc8e-8af6-4764-bb9a-c86a529be857/resourceGroups/rg-Azure-Migrate/providers/Microsoft.Network/virtualNetworks/vnet-hub/subnets/private-endpoints\",\"virtualNetworkLocation\":\"centralus\",\"skipPrivateDnsZoneCreation\":false}"
+                    }
+                }
+            }
+        }
+  ]
+}
